@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -55,6 +54,14 @@ interface SystemStatus {
   unit: string;
   change: number;
   data: MetricData[];
+}
+
+// Define the navigation item type to include acknowledged property
+interface NavItem {
+  name: string;
+  id: string;
+  icon: React.ReactNode;
+  acknowledged?: boolean;
 }
 
 const LiveDashboard = () => {
@@ -448,6 +455,41 @@ const LiveDashboard = () => {
     showToast("Settings saved successfully");
   };
 
+  // Navigation items array with proper type
+  const navItems: NavItem[] = [
+    {
+      name: "Overview",
+      id: "overview",
+      icon: <ChartBar className="h-5 w-5" />,
+    },
+    {
+      name: "Metrics",
+      id: "metrics",
+      icon: (
+        <svg
+          className="h-5 w-5"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+          />
+        </svg>
+      ),
+    },
+    {
+      name: "Alerts",
+      id: "alerts",
+      icon: <BellRing className="h-5 w-5" />,
+      acknowledged: false,
+    },
+  ];
+
   return (
     <div className={`min-h-screen ${darkMode ? "dark bg-gray-900 text-white" : "bg-gray-50"}`}>
       {/* Navigation Bar */}
@@ -668,42 +710,7 @@ const LiveDashboard = () => {
 
             {/* Navigation Menu */}
             <nav className="space-y-1">
-              {[
-                {
-                  name: "Overview",
-                  id: "overview",
-                  icon: (
-                    <ChartBar className="h-5 w-5" />
-                  ),
-                },
-                {
-                  name: "Metrics",
-                  id: "metrics",
-                  icon: (
-                    <svg
-                      className="h-5 w-5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                      />
-                    </svg>
-                  ),
-                },
-                {
-                  name: "Alerts",
-                  id: "alerts",
-                  icon: (
-                    <BellRing className="h-5 w-5" />
-                  ),
-                },
-              ].map((item) => (
+              {navItems.map((item) => (
                 <motion.a
                   key={item.id}
                   whileHover={{ scale: 1.02 }}
@@ -735,7 +742,7 @@ const LiveDashboard = () => {
                   {sidebarOpen && <span>{item.name}</span>}
                   
                   {/* Show alert count badge */}
-                  {item.id === "alerts" && !item.acknowledged && alerts.filter(a => !a.acknowledged).length > 0 && (
+                  {item.id === "alerts" && alerts.filter(a => !a.acknowledged).length > 0 && (
                     <motion.span 
                       className={`${
                         darkMode ? "bg-rose-700 text-white" : "bg-rose-500 text-white"
